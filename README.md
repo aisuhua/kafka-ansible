@@ -51,3 +51,4 @@ ansible-playbook remove.yaml
 - 安装 kafka-ui
 - kafka cluster health check
 - create/update/delete topic
+- 升级 kafka
