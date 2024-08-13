@@ -1,0 +1,20 @@
+- name: set nofile in /etc/security/limits.conf
+  pam_limits:
+    domain: '*'
+    limit_type: '-'
+    limit_item: nofile
+    value: "65535"
+
+- name: set nproc in /etc/security/limits.conf
+  pam_limits:
+    domain: '*'
+    limit_type: '-'
+    limit_item: nproc
+    value: "65535"
+
+- name: ensure requirements are installed on the system
+  yum:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - java

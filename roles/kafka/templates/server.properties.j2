@@ -1,0 +1,77 @@
+process.roles=broker,controller
+node.id={{ kafka_id }}
+
+{# Example: controller.quorum.voters=1@172.31.96.149:29093,2@172.31.96.149:29094,3@172.31.96.149:29095 #}
+{% set arr = [] %}
+{% for host in groups['all'] %}
+{% set _ = arr.append(hostvars[host].kafka_id | string + '@' + hostvars[host].ansible_ssh_host + ':' + hostvars[host].kafka_controller_port | string) %}
+{% endfor %}
+controller.quorum.voters={{ arr | join(',') }}
+
+{% if kafka_basic_auth is defined and kafka_basic_auth | bool  %}
+{# with basic auth #}
+listeners=SASL_PLAINTEXT://{{ ansible_ssh_host }}:{{ kafka_client_port }},CONTROLLER://{{ ansible_ssh_host }}:{{ kafka_controller_port }}
+advertised.listeners=SASL_PLAINTEXT://{{ ansible_ssh_host }}:{{ kafka_client_port }}
+
+inter.broker.listener.name=SASL_PLAINTEXT
+controller.listener.names=CONTROLLER
+
+listener.security.protocol.map=CONTROLLER:SASL_PLAINTEXT,PLAINTEXT:PLAINTEXT,SSL:SSL,SASL_PLAINTEXT:SASL_PLAINTEXT,SASL_SSL:SASL_SSL
+
+sasl.mechanism.controller.protocol=PLAIN
+sasl.mechanism.inter.broker.protocol=PLAIN
+sasl.enabled.mechanisms=PLAIN
+
+authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer
+{# Example: super.users=User:admin;User:admin01;User:appuser01;User:appuser02 #}
+{% set arr = ['User:admin'] %}
+{% for item in kafka_basic_auth_users %}
+{% set _ = arr.append('User:' + item) %}
+{% endfor %}
+super.users={{ arr | join(';') }}
+
+{% else %}
+{# without basic auth #}
+listeners=PLAINTEXT://{{ ansible_ssh_host }}:{{ kafka_client_port }},CONTROLLER://{{ ansible_ssh_host }}:{{ kafka_controller_port }}
+advertised.listeners=PLAINTEXT://{{ ansible_ssh_host }}:{{ kafka_client_port }}
+
+inter.broker.listener.name=PLAINTEXT
+controller.listener.names=CONTROLLER
+
+listener.security.protocol.map=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,SSL:SSL,SASL_PLAINTEXT:SASL_PLAINTEXT,SASL_SSL:SASL_SSL
+{% endif %}
+
+num.network.threads=3
+num.io.threads=8
+
+socket.send.buffer.bytes=2097152
+socket.receive.buffer.bytes=2097152
+socket.request.max.bytes=104857600
+
+log.dirs={{ kafka_log_dir }}
+
+num.partitions=3
+num.recovery.threads.per.data.dir=1
+default.replication.factor=2
+
+offsets.topic.replication.factor=3
+transaction.state.log.replication.factor=3
+transaction.state.log.min.isr=2
+
+num.replica.fetchers=3
+replica.fetch.min.bytes=1
+replica.fetch.max.bytes=5242880
+
+log.retention.hours=72
+log.segment.bytes=1073741824
+log.retention.bytes=32212254720
+log.retention.check.interval.ms=300000
+
+log.flush.interval.messages=10000
+log.flush.interval.ms=1000
+group.initial.rebalance.delay.ms=0
+
+# append config
+{% if kafka_auto_create_topics_enable is defined %}
+auto.create.topics.enable={{ kafka_auto_create_topics_enable }}
+{% endif %}

@@ -1,0 +1,36 @@
+---
+- name: remove
+  hosts: all
+  become: true
+  gather_facts: true
+
+  roles:
+    - init
+ 
+  handlers:
+    - name: systemctl daemon-reload
+      systemd:
+        daemon_reload: yes
+  
+  tasks:
+    - name: stop kafka service
+      service:
+        name: "{{ kafka_service_name }}"
+        enabled: false
+        state: stopped
+      failed_when: false
+
+    - name: remove systemd service file
+      file:
+        path: "/etc/systemd/system/{{ kafka_service_name }}.service"
+        state: absent
+      loop:
+        - "/etc/systemd/system/{{ kafka_service_name }}.service"
+        - "/etc/systemd/system/multi-user.target.wants/{{ kafka_service_name }}.service"
+      notify: systemctl daemon-reload
+
+    - name: remove install folder
+      file:
+        path: "{{ kafka_install_dir }}"
+        state: absent
+    

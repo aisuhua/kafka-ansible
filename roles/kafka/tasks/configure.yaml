@@ -1,0 +1,52 @@
+- name: set server.properties
+  template:
+    src: server.properties.j2
+    dest: "{{ kafka_install_dir }}/config/kraft/server.properties"
+    owner: "{{ kafka_run_user }}"
+    group: "{{ kafka_run_group }}"
+  notify: 
+    - restart kafka
+  tags: test
+
+- name: check log dir is formated or not
+  stat:
+    path: "{{ kafka_log_dir }}/meta.properties"
+  register: log_status
+
+- name: format the storage directories
+  shell: "{{ kafka_install_dir }}/bin/kafka-storage.sh format -t {{ kafka_cluster_id }} -c {{ kafka_install_dir }}/config/kraft/server.properties"
+  become_user: "{{ kafka_run_user }}"
+  when: not log_status.stat.exists
+
+- name: set kafka.service config
+  template:
+    src: kafka.service.j2
+    dest: "/etc/systemd/system/{{ kafka_service_name }}.service"
+  notify: 
+    - systemctl daemon-reload
+    - restart kafka
+
+- name: set kafka_server_jaas.conf
+  template:
+    src: kafka_server_jaas.conf.j2
+    dest: "{{ kafka_install_dir }}/config/kraft/kafka_server_jaas.conf"
+    owner: "{{ kafka_run_user }}"
+    group: "{{ kafka_run_group }}"
+  notify: 
+    - restart kafka
+  when: 
+    - kafka_basic_auth is defined
+    - kafka_basic_auth | bool
+
+- name: set admin.conf
+  template:
+    src: admin.conf.j2
+    dest: "{{ kafka_install_dir }}/config/kraft/admin.conf"
+    owner: "{{ kafka_run_user }}"
+    group: "{{ kafka_run_group }}"
+  when: 
+    - kafka_basic_auth is defined
+    - kafka_basic_auth | bool
+
+- name: ensuring that handlers are executed
+  meta: flush_handlers

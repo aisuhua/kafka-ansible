@@ -1,0 +1,4 @@
+- include: preinstall.yaml
+- include: install.yaml
+- include: configure.yaml
+- include: start.yaml
