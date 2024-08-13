@@ -45,3 +45,9 @@ ansible-playbook remove.yaml
 - [SASL configuration](https://kafka.apache.org/documentation/#security_sasl_brokerconfig)
 - [7.5 Authorization and ACLs](https://kafka.apache.org/documentation/#security_authz)
 - [基于KRaft模式的kafka集群搭建](https://wiki.sqlfans.cn/linux/kafka-cluster-setup.html) 快速搭建一套基于 Kraft 集群
+
+## TODO
+
+- 安装 kafka-ui
+- kafka cluster health check
+- create/update/delete topic
