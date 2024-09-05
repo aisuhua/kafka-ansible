@@ -35,7 +35,8 @@ ansible-playbook remove.yaml
 
 ```sh
 # 查看 borker 信息
-# /opt/kafka/3.8.0/server1-kafka1/bin/kafka-broker-api-versions.sh --bootstrap-server 172.31.96.151:19093 \
+/opt/kafka/3.8.0/server1-kafka1/bin/kafka-broker-api-versions.sh \
+  --bootstrap-server 172.31.96.151:19093 \
   --command-config /opt/kafka/3.8.0/server1-kafka1/config/kraft/admin.conf | grep rack
 ```
 
