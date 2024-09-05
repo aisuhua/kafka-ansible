@@ -1,9 +1,9 @@
 KafkaServer {
     org.apache.kafka.common.security.plain.PlainLoginModule required
     username="admin"
-    password="{{ kafka_basic_auth_admin }}"
-    user_admin="{{ kafka_basic_auth_admin }}"
-{% for item in kafka_basic_auth_users %}
-    user_{{ item }}="{{ kafka_basic_auth_users[item] }}"{% if loop.last %};{% endif %} 
+    password="{{ kafka_auth.admin_password }}"
+    user_admin="{{ kafka_auth.admin_password }}"
+{% for user in kafka_auth.users %}
+    user_{{ user.username }}="{{ user.password }}"{% if loop.last %};{% endif %} 
 {% endfor %}
 };

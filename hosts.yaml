@@ -1,0 +1,36 @@
+ungrouped:
+  hosts:
+    server1-kafka1:
+      ansible_ssh_host: 172.31.96.151
+      kafka_id: 1
+      kafka_client_port: 19093 
+      kafka_controller_port: 29093
+    server2-kafka1:
+      ansible_ssh_host: 172.31.96.151 
+      kafka_id: 2
+      kafka_client_port: 19094
+      kafka_controller_port: 29094
+    server3-kafka1:
+      ansible_ssh_host: 172.31.96.151 
+      kafka_id: 3
+      kafka_client_port: 19095 
+      kafka_controller_port: 29095
+  vars:
+    kafka_version: 3.8.0
+    kafka_download_url: http://172.31.96.1/kafka/kafka_2.13-3.8.0.tgz
+    kafka_install_dir: "/opt/kafka/{{ kafka_version }}/{{ inventory_hostname }}"
+    kafka_log_dir: "{{ kafka_install_dir }}/data/kraft-combined-logs"
+    kafka_service_name: "kafka-{{ kafka_version }}-{{ inventory_hostname }}"
+    kafka_run_user: kafka
+    kafka_run_group: kafka
+    kafka_cluster_id: 4G6z3RQ0Sl-oTG0wg_-JJQ
+    kafka_config:
+      auto_create_topics_enable: true
+    kafka_auth:
+      enable: true
+      admin_password: Luck@u99
+      users:
+        - username: admin01
+          password: Luck@u99
+        - username: appuser01
+          password: Luck@u99 

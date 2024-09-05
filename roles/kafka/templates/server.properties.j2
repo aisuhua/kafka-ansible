@@ -8,8 +8,8 @@ node.id={{ kafka_id }}
 {% endfor %}
 controller.quorum.voters={{ arr | join(',') }}
 
-{% if kafka_basic_auth is defined and kafka_basic_auth | bool  %}
-{# with basic auth #}
+{% if kafka_auth.enable | bool  %}
+{# with auth #}
 listeners=SASL_PLAINTEXT://{{ ansible_ssh_host }}:{{ kafka_client_port }},CONTROLLER://{{ ansible_ssh_host }}:{{ kafka_controller_port }}
 advertised.listeners=SASL_PLAINTEXT://{{ ansible_ssh_host }}:{{ kafka_client_port }}
 
@@ -25,13 +25,13 @@ sasl.enabled.mechanisms=PLAIN
 authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer
 {# Example: super.users=User:admin;User:admin01;User:appuser01;User:appuser02 #}
 {% set arr = ['User:admin'] %}
-{% for item in kafka_basic_auth_users %}
-{% set _ = arr.append('User:' + item) %}
+{% for user in kafka_auth.users %}
+{% set _ = arr.append('User:' + user.username) %}
 {% endfor %}
 super.users={{ arr | join(';') }}
 
 {% else %}
-{# without basic auth #}
+{# without auth #}
 listeners=PLAINTEXT://{{ ansible_ssh_host }}:{{ kafka_client_port }},CONTROLLER://{{ ansible_ssh_host }}:{{ kafka_controller_port }}
 advertised.listeners=PLAINTEXT://{{ ansible_ssh_host }}:{{ kafka_client_port }}
 
@@ -72,6 +72,6 @@ log.flush.interval.ms=1000
 group.initial.rebalance.delay.ms=0
 
 # append config
-{% if kafka_auto_create_topics_enable is defined %}
-auto.create.topics.enable={{ kafka_auto_create_topics_enable }}
+{% if kafka_config.auto_create_topics_enable is defined %}
+auto.create.topics.enable={{ kafka_config.auto_create_topics_enable }}
 {% endif %}

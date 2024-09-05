@@ -6,7 +6,6 @@
     group: "{{ kafka_run_group }}"
   notify: 
     - restart kafka
-  tags: test
 
 - name: check log dir is formated or not
   stat:
@@ -35,8 +34,8 @@
   notify: 
     - restart kafka
   when: 
-    - kafka_basic_auth is defined
-    - kafka_basic_auth | bool
+    - kafka_auth.enable is defined
+    - kafka_auth.enable | bool
 
 - name: set admin.conf
   template:
@@ -45,8 +44,8 @@
     owner: "{{ kafka_run_user }}"
     group: "{{ kafka_run_group }}"
   when: 
-    - kafka_basic_auth is defined
-    - kafka_basic_auth | bool
+    - kafka_auth.enable is defined
+    - kafka_auth.enable | bool
 
 - name: ensuring that handlers are executed
   meta: flush_handlers

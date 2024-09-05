@@ -7,7 +7,7 @@ After=network.target
 Type=simple
 User={{ kafka_run_user }}
 Group={{ kafka_run_group }}
-{% if kafka_basic_auth is defined and kafka_basic_auth | bool  %}
+{% if kafka_auth.enable is defined and kafka_auth.enable | bool %}
 Environment="KAFKA_OPTS=-Djava.security.auth.login.config={{ kafka_install_dir }}/config/kraft/kafka_server_jaas.conf"
 {% endif %}
 ExecStart={{ kafka_install_dir }}/bin/kafka-server-start.sh {{ kafka_install_dir }}/config/kraft/server.properties 

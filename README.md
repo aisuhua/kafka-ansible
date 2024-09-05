@@ -31,6 +31,14 @@ ansible-playbook remove.yaml
 
 该脚本在 RHEL7、Kylin V10 SP1/SP2 测试过
 
+## 测试
+
+```sh
+# 查看 borker 信息
+# /opt/kafka/3.8.0/server1-kafka1/bin/kafka-broker-api-versions.sh --bootstrap-server 172.31.96.151:19093 \
+  --command-config /opt/kafka/3.8.0/server1-kafka1/config/kraft/admin.conf | grep rack
+```
+
 ## 参考项目
 
 - https://github.com/inomera/kafka-3-cluster 采用 Kraft 并放弃 ZooKeeper
